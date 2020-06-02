@@ -1,6 +1,9 @@
 package server
 
-func startElection(s *Server) {
+type bullyElection struct {
+}
+
+func start(s *Server) {
 	if isHighest(s) {
 		notifyLow(s)
 		s.setMaster(s.id)

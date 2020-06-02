@@ -4,14 +4,18 @@ import (
 	"crypto/rand"
 	"fmt"
 	"log"
+
+	"github.com/LostLaser/recover-e/emitter"
 )
 
 // Server is a single entity
 type Server struct {
-	master          string
-	id              string
-	state           string
-	NeighborServers map[string]*Server
+	master            string
+	id                string
+	state             string
+	NeighborServers   map[string]*Server
+	electionAlgorithm Election
+	emitter           *emitter.Emitter
 }
 
 const (
@@ -20,11 +24,12 @@ const (
 )
 
 // New will create a cluster with the specified number of servers
-func New() *Server {
+func New(e *emitter.Emitter) *Server {
 	s := new(Server)
 	s.id = generateUniqueID()
 	s.state = stopped
 	s.NeighborServers = make(map[string]*Server)
+	s.emitter = e
 
 	return s
 }

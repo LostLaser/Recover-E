@@ -8,12 +8,13 @@ func (s *Server) run() {
 	for s.state == running {
 		time.Sleep(time.Second)
 		if !s.pingMaster() {
-			startElection(s)
+			start(s)
 		}
 	}
 }
 
 func (s *Server) pingMaster() bool {
+	s.emitter.Write(s.id, s.master, "HEARTBEAT")
 	if s.master == "" || (s.master != s.id && !s.NeighborServers[s.master].isUp()) {
 		return false
 	}
@@ -22,6 +23,7 @@ func (s *Server) pingMaster() bool {
 
 func (s *Server) setMaster(masterID string) {
 	s.master = masterID
+	s.emitter.Write(s.id, s.master, "SET MASTER")
 }
 
 func (s *Server) isUp() bool {
