@@ -8,7 +8,7 @@ func (s *Server) run() {
 	for s.state == running {
 		time.Sleep(time.Second)
 		if !s.pingMaster() {
-			start(s)
+			startElection(s)
 		}
 	}
 }
