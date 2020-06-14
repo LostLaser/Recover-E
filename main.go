@@ -3,14 +3,12 @@ package main
 import (
 	"time"
 
-	"github.com/LostLaser/recover-e/cluster"
+	"github.com/LostLaser/recoverE/cluster"
 )
 
 func main() {
-	c1 := cluster.New(10)
-	go c1.Stream()
-	time.Sleep(time.Second * 4)
-	c1.Purge()
-
-	return
+	c := cluster.New(4, time.Second)
+	go c.Stream()
+	time.Sleep(4 * time.Second)
+	c.ListServers()
 }

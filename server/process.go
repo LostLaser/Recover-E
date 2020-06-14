@@ -6,9 +6,11 @@ import (
 
 func (s *Server) run() {
 	for s.state == running {
-		time.Sleep(time.Second)
-		if !s.pingMaster() {
+		time.Sleep(s.heartbeatPause)
+		if !s.pingMaster() || s.triggerElection {
+			s.triggerElection = true
 			startElection(s)
+			s.triggerElection = false
 		}
 	}
 }
@@ -22,6 +24,8 @@ func (s *Server) pingMaster() bool {
 }
 
 func (s *Server) setMaster(masterID string) {
+	s.electionLock.Lock()
+	defer s.electionLock.Unlock()
 	s.master = masterID
 	s.emitter.Write(s.id, s.master, "SET MASTER")
 }

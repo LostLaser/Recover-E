@@ -2,9 +2,10 @@ package cluster
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/LostLaser/recover-e/emitter"
-	"github.com/LostLaser/recover-e/server"
+	"github.com/LostLaser/recoverE/emitter"
+	"github.com/LostLaser/recoverE/server"
 )
 
 // Cluster is a linked collection of servers
@@ -14,13 +15,13 @@ type Cluster struct {
 }
 
 // New will create a cluster with the specified number of servers
-func New(serverCount int) *Cluster {
+func New(serverCount int, heartbeatPause time.Duration) *Cluster {
 	c := new(Cluster)
 	c.linkedServers = make(map[string]*server.Server)
-	c.emitter = emitter.New(100)
+	c.emitter = emitter.New(serverCount * 10)
 
 	for i := 0; i < serverCount; i++ {
-		s := server.New(c.emitter)
+		s := server.New(c.emitter, heartbeatPause)
 		c.linkedServers[s.GetID()] = s
 	}
 	for currKey, currserver := range c.linkedServers {
