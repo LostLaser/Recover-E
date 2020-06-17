@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/LostLaser/recoverE/emitter"
@@ -50,10 +49,7 @@ func (c Cluster) Purge() {
 	}
 }
 
-//Stream will retrieve an ordered event log of the servers' actions
-func (c Cluster) Stream() {
-	for {
-		msg := c.emitter.Read()
-		fmt.Println(msg["from"], "sent", msg["details"], "to", msg["to"])
-	}
+//ReadEvent will retrieve a single event log of the servers' actions
+func (c Cluster) ReadEvent() string {
+	return c.emitter.Read()
 }

@@ -19,6 +19,7 @@ func (e *Emitter) Write(from string, to string, details string) {
 }
 
 //Read returns the oldest message in the emitter, will block if no message is available
-func (e *Emitter) Read() map[string]string {
-	return <-e.messages
+func (e *Emitter) Read() string {
+	val := <-e.messages
+	return val["from"] + "sent" + val["details"] + "to" + val["to"]
 }
