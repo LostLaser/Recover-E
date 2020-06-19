@@ -14,12 +14,12 @@ func New(bufferSize int) *Emitter {
 }
 
 //Write will add a new message to the emitter
-func (e *Emitter) Write(from string, to string, details string) {
-	e.messages <- map[string]string{"from": from, "to": to, "details": details}
+func (e *Emitter) Write(from string, to string, action string) {
+	e.messages <- map[string]string{"from": from, "to": to, "action": action}
 }
 
 //Read returns the oldest message in the emitter, will block if no message is available
-func (e *Emitter) Read() string {
+func (e *Emitter) Read() map[string]string {
 	val := <-e.messages
-	return val["from"] + "sent" + val["details"] + "to" + val["to"]
+	return val
 }

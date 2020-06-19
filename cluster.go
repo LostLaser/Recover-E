@@ -35,11 +35,14 @@ func New(serverCount int, heartbeatPause time.Duration) *Cluster {
 	return c
 }
 
-//ListServers prints all servers in the cluster
-func (c Cluster) ListServers() {
+//ServerIds returns all server ids in the cluster
+func (c Cluster) ServerIds() []string {
+	var ids []string
 	for _, s := range c.linkedServers {
-		s.Print()
+		ids = append(ids, s.GetID())
 	}
+
+	return ids
 }
 
 // Purge will stop all of the linked servers
@@ -50,6 +53,6 @@ func (c Cluster) Purge() {
 }
 
 //ReadEvent will retrieve a single event log of the servers' actions
-func (c Cluster) ReadEvent() string {
+func (c Cluster) ReadEvent() map[string]string {
 	return c.emitter.Read()
 }
