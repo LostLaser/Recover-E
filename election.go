@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/LostLaser/recoverE/emitter"
-	"github.com/LostLaser/recoverE/server"
+	"github.com/LostLaser/election/emitter"
+	"github.com/LostLaser/election/server"
 )
 
 // Cluster is a linked collection of servers

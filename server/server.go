@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LostLaser/recoverE/emitter"
+	"github.com/LostLaser/election/emitter"
 )
 
 // Server is a single entity
