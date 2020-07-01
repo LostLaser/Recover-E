@@ -20,6 +20,7 @@ func (s *Server) pingMaster() bool {
 	if s.master == "" || (s.master != s.id && !s.NeighborServers[s.master].isUp()) {
 		return false
 	}
+
 	return true
 }
 
@@ -27,7 +28,7 @@ func (s *Server) setMaster(masterID string) {
 	s.electionLock.Lock()
 	defer s.electionLock.Unlock()
 	s.master = masterID
-	s.emitter.Write(s.id, s.master, "SET MASTER")
+	s.emitter.Write(s.id, s.master, "ELECT")
 }
 
 func (s *Server) isUp() bool {

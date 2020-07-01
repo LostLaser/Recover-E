@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"errors"
 	"time"
 
 	"github.com/LostLaser/recoverE/emitter"
@@ -52,7 +53,34 @@ func (c Cluster) Purge() {
 	}
 }
 
+// StopServer stops the server with the specified id in the cluster
+func (c Cluster) StopServer(id string) error {
+	s, err := c.getServerByID(id)
+	if err == nil {
+		s.Stop()
+	}
+	return err
+}
+
+// StartServer starts the server with the specified id in the cluster
+func (c Cluster) StartServer(id string) error {
+	s, err := c.getServerByID(id)
+	if err == nil {
+		s.Start()
+	}
+	return err
+}
+
 //ReadEvent will retrieve a single event log of the servers' actions
 func (c Cluster) ReadEvent() map[string]string {
 	return c.emitter.Read()
+}
+
+func (c Cluster) getServerByID(id string) (*server.Server, error) {
+	for key, s := range c.linkedServers {
+		if id == key {
+			return s, nil
+		}
+	}
+	return nil, errors.New("No server found with specified ID")
 }
