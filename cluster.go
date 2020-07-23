@@ -30,7 +30,7 @@ func New(serverCount int, heartbeatPause time.Duration) *Cluster {
 				currserver.NeighborServers[key] = server
 			}
 		}
-		go currserver.Start()
+		go currserver.Initialize()
 	}
 
 	return c

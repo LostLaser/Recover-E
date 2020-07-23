@@ -32,7 +32,7 @@ const (
 func New(e *emitter.Emitter, heartbeatPause time.Duration) *Server {
 	s := new(Server)
 	s.id = generateUniqueID()
-	s.state = stopped
+	s.state = running
 	s.NeighborServers = make(map[string]*Server)
 	s.emitter = e
 	s.heartbeatPause = heartbeatPause
@@ -40,15 +40,23 @@ func New(e *emitter.Emitter, heartbeatPause time.Duration) *Server {
 	return s
 }
 
-// Start brings up the server
+// Initialize brings up the server and runs main process
+func (s *Server) Initialize() {
+	s.state = running
+	s.run()
+}
+
+// Start the provided server
 func (s *Server) Start() {
 	s.state = running
-	go s.run()
+	s.emitter.Write(s.id, "", "STARTED")
 }
 
 // Stop the provided server
 func (s *Server) Stop() {
 	s.state = stopped
+	s.master = ""
+	s.emitter.Write(s.id, "", "STOPPED")
 }
 
 // Print displays the server information in a readable format

@@ -5,13 +5,14 @@ import (
 )
 
 func (s *Server) run() {
-	for s.state == running {
-		time.Sleep(s.heartbeatPause)
-		if !s.pingMaster() || s.triggerElection {
-			s.triggerElection = true
-			startElection(s)
-			s.triggerElection = false
+	for {
+		if s.state == running {
+			if !s.pingMaster() || s.triggerElection {
+				startElection(s)
+				s.triggerElection = false
+			}
 		}
+		time.Sleep(s.heartbeatPause)
 	}
 }
 
@@ -25,10 +26,16 @@ func (s *Server) pingMaster() bool {
 }
 
 func (s *Server) setMaster(masterID string) {
+	if !s.isUp() {
+		return
+	}
 	s.electionLock.Lock()
 	defer s.electionLock.Unlock()
+	if masterID != s.id && s.id == s.master {
+		s.emitter.Write(s.id, "", "NOT_MASTER")
+	}
+	s.emitter.Write(masterID, s.id, "ELECT")
 	s.master = masterID
-	s.emitter.Write(s.id, s.master, "ELECT")
 }
 
 func (s *Server) isUp() bool {
