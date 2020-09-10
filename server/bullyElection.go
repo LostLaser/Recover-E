@@ -1,9 +1,10 @@
 package server
 
-type bullyElection struct {
+// BullyElection implements the bully election algorithm
+type BullyElection struct {
 }
 
-func startElection(s *Server) {
+func (b *BullyElection) startElection(s *Server) {
 	s.emitter.Write(s.id, "", "ELECTION_STARTED")
 	if isHighest(s) {
 		notifyLow(s)
@@ -11,6 +12,11 @@ func startElection(s *Server) {
 		s.emitter.Write(s.id, "", "ELECTED")
 	}
 	s.emitter.Write(s.id, "", "ELECTION_ENDED")
+}
+
+func (b *BullyElection) connectServers(s map[string]*Server) map[string]*Server {
+
+	return nil
 }
 
 func isHighest(s *Server) bool {

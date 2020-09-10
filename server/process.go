@@ -8,7 +8,7 @@ func (s *Server) run() {
 	for {
 		if s.state == running {
 			if !s.pingMaster() || s.triggerElection {
-				startElection(s)
+				s.electionAlgorithm.startElection(s)
 				s.triggerElection = false
 			}
 		}

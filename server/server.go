@@ -29,13 +29,14 @@ const (
 )
 
 // New will create a cluster with the specified number of servers
-func New(e *emitter.Emitter, heartbeatPause time.Duration) *Server {
+func New(e *emitter.Emitter, heartbeatPause time.Duration, electionAlgorithm Election) *Server {
 	s := new(Server)
 	s.id = generateUniqueID()
 	s.state = running
 	s.NeighborServers = make(map[string]*Server)
 	s.emitter = e
 	s.heartbeatPause = heartbeatPause
+	s.electionAlgorithm = electionAlgorithm
 
 	return s
 }

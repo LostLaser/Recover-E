@@ -1,11 +1,14 @@
 package server
 
-type ringElection struct {
+// RingElection implements the ring election algorithm
+type RingElection struct {
 }
 
-func (r ringElection) start(s *Server) {
-	if isHighest(s) {
-		notifyLow(s)
-		s.setMaster(s.id)
-	}
+func (r *RingElection) startElection(s *Server) {
+	return
+}
+
+func (r *RingElection) connectServers(s map[string]*Server) map[string]*Server {
+
+	return nil
 }

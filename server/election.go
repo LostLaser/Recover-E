@@ -2,5 +2,6 @@ package server
 
 // Election is an interface for all supported election types
 type Election interface {
-	start()
+	startElection(*Server)
+	connectServers(map[string]*Server) map[string]*Server
 }

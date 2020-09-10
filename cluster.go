@@ -10,8 +10,9 @@ import (
 
 // Cluster is a linked collection of servers
 type Cluster struct {
-	linkedServers map[string]*server.Server
-	emitter       *emitter.Emitter
+	linkedServers     map[string]*server.Server
+	emitter           *emitter.Emitter
+	electionAlgorithm server.Election
 }
 
 // New will create a cluster with the specified number of servers
@@ -19,9 +20,10 @@ func New(serverCount int, heartbeatPause time.Duration) *Cluster {
 	c := new(Cluster)
 	c.linkedServers = make(map[string]*server.Server)
 	c.emitter = emitter.New(serverCount * 10)
+	c.electionAlgorithm = &server.BullyElection{}
 
 	for i := 0; i < serverCount; i++ {
-		s := server.New(c.emitter, heartbeatPause)
+		s := server.New(c.emitter, heartbeatPause, c.electionAlgorithm)
 		c.linkedServers[s.GetID()] = s
 	}
 	for currKey, currserver := range c.linkedServers {
