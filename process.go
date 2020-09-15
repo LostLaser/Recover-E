@@ -1,4 +1,4 @@
-package server
+package election
 
 import (
 	"time"
@@ -8,7 +8,7 @@ func (s *Server) run() {
 	for {
 		if s.state == running {
 			if !s.pingMaster() || s.triggerElection {
-				s.electionAlgorithm.startElection(s)
+				s.electionAlgorithm.StartElection(s)
 				s.triggerElection = false
 			}
 		}

@@ -1,4 +1,4 @@
-package server
+package election
 
 import (
 	"crypto/rand"
@@ -6,8 +6,6 @@ import (
 	"log"
 	"sync"
 	"time"
-
-	"github.com/LostLaser/election/emitter"
 )
 
 // Server is a single entity
@@ -19,7 +17,7 @@ type Server struct {
 	electionAlgorithm Election
 	electionLock      sync.Mutex
 	triggerElection   bool
-	emitter           *emitter.Emitter
+	emitter           *Emitter
 	heartbeatPause    time.Duration
 }
 
@@ -28,8 +26,8 @@ const (
 	stopped = "stopped"
 )
 
-// New will create a cluster with the specified number of servers
-func New(e *emitter.Emitter, heartbeatPause time.Duration, electionAlgorithm Election) *Server {
+// NewServer will create a cluster with the specified number of servers
+func NewServer(e *Emitter, heartbeatPause time.Duration, electionAlgorithm Election) *Server {
 	s := new(Server)
 	s.id = generateUniqueID()
 	s.state = running

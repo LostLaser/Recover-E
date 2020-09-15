@@ -8,8 +8,9 @@ import (
 func TestNew(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 
-	cluster := New(expectedServerCount, cycleTime)
+	cluster := New(expectedServerCount, cycleTime, algorithm)
 
 	actualServerCount := len(cluster.linkedServers)
 	if actualServerCount != expectedServerCount {
@@ -18,11 +19,12 @@ func TestNew(t *testing.T) {
 }
 
 func TestNeighbors(t *testing.T) {
-	expectedServerCount := 3
+	expectedServerCount := 5
 	expectedNeighborCount := expectedServerCount - 1
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 
-	cluster := New(expectedServerCount, cycleTime)
+	cluster := New(expectedServerCount, cycleTime, algorithm)
 	for _, server := range cluster.linkedServers {
 		neighborCount := len(server.NeighborServers)
 		if neighborCount != expectedNeighborCount {
@@ -34,8 +36,9 @@ func TestNeighbors(t *testing.T) {
 func TestServerListingCount(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 
-	cluster := New(expectedServerCount, cycleTime)
+	cluster := New(expectedServerCount, cycleTime, algorithm)
 
 	actualServerCount := len(cluster.ServerIds())
 	if actualServerCount != expectedServerCount {
@@ -46,8 +49,9 @@ func TestServerListingCount(t *testing.T) {
 func TestServerListingConsistency(t *testing.T) {
 	serverCount := 3
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 
-	cluster := New(serverCount, cycleTime)
+	cluster := New(serverCount, cycleTime, algorithm)
 
 	for _, i := range cluster.ServerIds() {
 		found := false
@@ -66,8 +70,9 @@ func TestServerListingConsistency(t *testing.T) {
 func TestReadEvent(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 
-	cluster := New(expectedServerCount, cycleTime)
+	cluster := New(expectedServerCount, cycleTime, algorithm)
 	c := make(chan (int))
 
 	go func() {
@@ -88,8 +93,9 @@ func TestReadEvent(t *testing.T) {
 func TestStop(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 
-	cluster := New(expectedServerCount, cycleTime)
+	cluster := New(expectedServerCount, cycleTime, algorithm)
 	serverIds := cluster.ServerIds()
 
 	if len(cluster.ServerIds()) == 0 {
@@ -107,9 +113,10 @@ func TestStop(t *testing.T) {
 func TestStopInvl(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
+	algorithm := &BullyElection{}
 	id := "invl"
 
-	cluster := New(expectedServerCount, cycleTime)
+	cluster := New(expectedServerCount, cycleTime, algorithm)
 	err := cluster.StopServer("invl")
 	if err == nil {
 		t.Errorf("No error recieved for invalid id: %s", id)

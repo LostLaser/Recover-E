@@ -1,10 +1,11 @@
-package server
+package election
 
 // BullyElection implements the bully election algorithm
 type BullyElection struct {
 }
 
-func (b *BullyElection) startElection(s *Server) {
+// StartElection runs the bully election algorithm on the provided server
+func (b BullyElection) StartElection(s *Server) {
 	s.emitter.Write(s.id, "", "ELECTION_STARTED")
 	if isHighest(s) {
 		notifyLow(s)
@@ -14,9 +15,15 @@ func (b *BullyElection) startElection(s *Server) {
 	s.emitter.Write(s.id, "", "ELECTION_ENDED")
 }
 
-func (b *BullyElection) connectServers(s map[string]*Server) map[string]*Server {
-
-	return nil
+// ConnectServers links the input servers in accordance with the bully algorithm
+func (b BullyElection) ConnectServers(s map[string]*Server) {
+	for currKey, currserver := range s {
+		for key, server := range s {
+			if currKey != key {
+				currserver.NeighborServers[key] = server
+			}
+		}
+	}
 }
 
 func isHighest(s *Server) bool {

@@ -1,12 +1,12 @@
-package emitter
+package election
 
 //Emitter is a specialized queue for messaging
 type Emitter struct {
 	messages chan map[string]string
 }
 
-//New creates an instance of an emitter
-func New(bufferSize int) *Emitter {
+//NewEmitter creates an instance of an emitter
+func NewEmitter(bufferSize int) *Emitter {
 	e := new(Emitter)
 	e.messages = make(chan map[string]string, bufferSize)
 
