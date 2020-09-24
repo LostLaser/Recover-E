@@ -1,4 +1,4 @@
-package election
+package server
 
 import (
 	"crypto/rand"
@@ -6,6 +6,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"github.com/LostLaser/election/server/communication"
 )
 
 // Server is a single entity
@@ -14,10 +16,10 @@ type Server struct {
 	id                string
 	state             string
 	NeighborServers   map[string]*Server
-	electionAlgorithm Election
+	electionAlgorithm Algorithm
 	electionLock      sync.Mutex
 	triggerElection   bool
-	emitter           *Emitter
+	emitter           *communication.Emitter
 	heartbeatPause    time.Duration
 }
 
@@ -26,8 +28,8 @@ const (
 	stopped = "stopped"
 )
 
-// NewServer will create a cluster with the specified number of servers
-func NewServer(e *Emitter, heartbeatPause time.Duration, electionAlgorithm Election) *Server {
+// New will create a cluster with the specified number of servers
+func New(e *communication.Emitter, heartbeatPause time.Duration, electionAlgorithm Algorithm) *Server {
 	s := new(Server)
 	s.id = generateUniqueID()
 	s.state = running
@@ -39,14 +41,14 @@ func NewServer(e *Emitter, heartbeatPause time.Duration, electionAlgorithm Elect
 	return s
 }
 
-// Initialize brings up the server and runs main process
-func (s *Server) Initialize() {
+// Boot brings up the server and runs main process
+func (s *Server) Boot() {
 	s.state = running
 	s.run()
 }
 
-// Start the provided server
-func (s *Server) Start() {
+// Restart the provided server
+func (s *Server) Restart() {
 	s.state = running
 	s.emitter.Write(s.id, "", "STARTED")
 }
@@ -77,4 +79,21 @@ func generateUniqueID() string {
 	uuid := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 
 	return uuid
+}
+
+func (s *Server) setMaster(masterID string) {
+	if !s.isUp() {
+		return
+	}
+	s.electionLock.Lock()
+	defer s.electionLock.Unlock()
+	if masterID != s.id && s.id == s.master {
+		s.emitter.Write(s.id, "", "NOT_MASTER")
+	}
+	s.emitter.Write(masterID, s.id, "ELECT")
+	s.master = masterID
+}
+
+func (s *Server) isUp() bool {
+	return s.state == running
 }

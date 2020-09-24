@@ -1,8 +1,6 @@
-package election
+package server
 
-import (
-	"time"
-)
+import "time"
 
 func (s *Server) run() {
 	for {
@@ -23,21 +21,4 @@ func (s *Server) pingMaster() bool {
 	}
 
 	return true
-}
-
-func (s *Server) setMaster(masterID string) {
-	if !s.isUp() {
-		return
-	}
-	s.electionLock.Lock()
-	defer s.electionLock.Unlock()
-	if masterID != s.id && s.id == s.master {
-		s.emitter.Write(s.id, "", "NOT_MASTER")
-	}
-	s.emitter.Write(masterID, s.id, "ELECT")
-	s.master = masterID
-}
-
-func (s *Server) isUp() bool {
-	return s.state == running
 }

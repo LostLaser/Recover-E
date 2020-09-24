@@ -3,12 +3,14 @@ package election
 import (
 	"testing"
 	"time"
+
+	"github.com/LostLaser/election/server"
 )
 
 func TestNew(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 
 	cluster := New(expectedServerCount, cycleTime, algorithm)
 
@@ -22,7 +24,7 @@ func TestNeighbors(t *testing.T) {
 	expectedServerCount := 5
 	expectedNeighborCount := expectedServerCount - 1
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 
 	cluster := New(expectedServerCount, cycleTime, algorithm)
 	for _, server := range cluster.linkedServers {
@@ -36,7 +38,7 @@ func TestNeighbors(t *testing.T) {
 func TestServerListingCount(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 
 	cluster := New(expectedServerCount, cycleTime, algorithm)
 
@@ -49,7 +51,7 @@ func TestServerListingCount(t *testing.T) {
 func TestServerListingConsistency(t *testing.T) {
 	serverCount := 3
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 
 	cluster := New(serverCount, cycleTime, algorithm)
 
@@ -70,7 +72,7 @@ func TestServerListingConsistency(t *testing.T) {
 func TestReadEvent(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 
 	cluster := New(expectedServerCount, cycleTime, algorithm)
 	c := make(chan (int))
@@ -93,7 +95,7 @@ func TestReadEvent(t *testing.T) {
 func TestStop(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 
 	cluster := New(expectedServerCount, cycleTime, algorithm)
 	serverIds := cluster.ServerIds()
@@ -113,7 +115,7 @@ func TestStop(t *testing.T) {
 func TestStopInvl(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &BullyElection{}
+	algorithm := &server.BullyElection{}
 	id := "invl"
 
 	cluster := New(expectedServerCount, cycleTime, algorithm)

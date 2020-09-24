@@ -1,4 +1,4 @@
-package election
+package server
 
 // BullyElection implements the bully election algorithm
 type BullyElection struct {

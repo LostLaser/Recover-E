@@ -3,31 +3,34 @@ package election
 import (
 	"errors"
 	"time"
+
+	"github.com/LostLaser/election/server"
+	"github.com/LostLaser/election/server/communication"
 )
 
 // Cluster is a linked collection of servers
 type Cluster struct {
-	linkedServers     map[string]*Server
-	emitter           *Emitter
-	electionAlgorithm Election
+	linkedServers     map[string]*server.Server
+	emitter           *communication.Emitter
+	electionAlgorithm server.Algorithm
 }
 
 // New will create a cluster with the specified number of servers
-func New(serverCount int, heartbeatPause time.Duration, algorithm Election) *Cluster {
+func New(serverCount int, heartbeatPause time.Duration, algorithm server.Algorithm) *Cluster {
 	c := new(Cluster)
-	c.linkedServers = make(map[string]*Server)
-	c.emitter = NewEmitter(serverCount * 10)
+	c.linkedServers = make(map[string]*server.Server)
+	c.emitter = communication.New(serverCount * 10)
 	c.electionAlgorithm = algorithm
 
 	for i := 0; i < serverCount; i++ {
-		s := NewServer(c.emitter, heartbeatPause, c.electionAlgorithm)
+		s := server.New(c.emitter, heartbeatPause, c.electionAlgorithm)
 		c.linkedServers[s.GetID()] = s
 	}
 
 	c.electionAlgorithm.ConnectServers(c.linkedServers)
 
 	for _, currserver := range c.linkedServers {
-		go currserver.Initialize()
+		go currserver.Boot()
 	}
 
 	return c
@@ -63,7 +66,7 @@ func (c Cluster) StopServer(id string) error {
 func (c Cluster) StartServer(id string) error {
 	s, err := c.getServerByID(id)
 	if err == nil {
-		s.Start()
+		s.Restart()
 	}
 	return err
 }
@@ -73,7 +76,7 @@ func (c Cluster) ReadEvent() map[string]string {
 	return c.emitter.Read()
 }
 
-func (c Cluster) getServerByID(id string) (*Server, error) {
+func (c Cluster) getServerByID(id string) (*server.Server, error) {
 	for key, s := range c.linkedServers {
 		if id == key {
 			return s, nil

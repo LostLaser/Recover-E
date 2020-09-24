@@ -1,4 +1,4 @@
-package election
+package server
 
 // RingElection implements the ring election algorithm
 type RingElection struct {
