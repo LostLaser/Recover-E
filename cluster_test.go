@@ -4,15 +4,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LostLaser/election/server"
+	"github.com/LostLaser/election/server/bully"
 )
 
 func TestNew(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
+	setup := bully.Setup{}
 
-	cluster := New(expectedServerCount, cycleTime, algorithm)
+	cluster := New(setup, expectedServerCount, cycleTime)
 
 	actualServerCount := len(cluster.linkedServers)
 	if actualServerCount != expectedServerCount {
@@ -21,26 +21,15 @@ func TestNew(t *testing.T) {
 }
 
 func TestNeighbors(t *testing.T) {
-	expectedServerCount := 5
-	expectedNeighborCount := expectedServerCount - 1
-	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
 
-	cluster := New(expectedServerCount, cycleTime, algorithm)
-	for _, server := range cluster.linkedServers {
-		neighborCount := len(server.NeighborServers)
-		if neighborCount != expectedNeighborCount {
-			t.Errorf("Server neighbor count was incorrect, got: %d, want: %d.", neighborCount, expectedNeighborCount)
-		}
-	}
 }
 
 func TestServerListingCount(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
+	setup := bully.Setup{}
 
-	cluster := New(expectedServerCount, cycleTime, algorithm)
+	cluster := New(setup, expectedServerCount, cycleTime)
 
 	actualServerCount := len(cluster.ServerIds())
 	if actualServerCount != expectedServerCount {
@@ -51,9 +40,9 @@ func TestServerListingCount(t *testing.T) {
 func TestServerListingConsistency(t *testing.T) {
 	serverCount := 3
 	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
+	setup := bully.Setup{}
 
-	cluster := New(serverCount, cycleTime, algorithm)
+	cluster := New(setup, serverCount, cycleTime)
 
 	for _, i := range cluster.ServerIds() {
 		found := false
@@ -72,9 +61,9 @@ func TestServerListingConsistency(t *testing.T) {
 func TestReadEvent(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
+	setup := bully.Setup{}
 
-	cluster := New(expectedServerCount, cycleTime, algorithm)
+	cluster := New(setup, expectedServerCount, cycleTime)
 	c := make(chan (int))
 
 	go func() {
@@ -95,9 +84,9 @@ func TestReadEvent(t *testing.T) {
 func TestStop(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
+	setup := bully.Setup{}
 
-	cluster := New(expectedServerCount, cycleTime, algorithm)
+	cluster := New(setup, expectedServerCount, cycleTime)
 	serverIds := cluster.ServerIds()
 
 	if len(cluster.ServerIds()) == 0 {
@@ -114,11 +103,11 @@ func TestStop(t *testing.T) {
 
 func TestStopInvl(t *testing.T) {
 	expectedServerCount := 3
-	cycleTime := time.Second
-	algorithm := &server.BullyElection{}
 	id := "invl"
+	cycleTime := time.Second
+	setup := bully.Setup{}
 
-	cluster := New(expectedServerCount, cycleTime, algorithm)
+	cluster := New(setup, expectedServerCount, cycleTime)
 	err := cluster.StopServer("invl")
 	if err == nil {
 		t.Errorf("No error recieved for invalid id: %s", id)

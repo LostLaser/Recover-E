@@ -5,31 +5,30 @@ import (
 	"time"
 
 	"github.com/LostLaser/election/server"
+	"github.com/LostLaser/election/server/bully"
 	"github.com/LostLaser/election/server/communication"
 )
 
 // Cluster is a linked collection of servers
 type Cluster struct {
-	linkedServers     map[string]*server.Server
-	emitter           *communication.Emitter
-	electionAlgorithm server.Algorithm
+	linkedServers map[string]server.Process
+	emitter       *communication.Emitter
 }
 
 // New will create a cluster with the specified number of servers
-func New(serverCount int, heartbeatPause time.Duration, algorithm server.Algorithm) *Cluster {
+func New(processSetup server.Setup, serverCount int, heartbeatPause time.Duration) *Cluster {
 	c := new(Cluster)
-	c.linkedServers = make(map[string]*server.Server)
+	c.linkedServers = make(map[string]server.Process)
 	c.emitter = communication.New(serverCount * 10)
-	c.electionAlgorithm = algorithm
 
-	for i := 0; i < serverCount; i++ {
-		s := server.New(c.emitter, heartbeatPause, c.electionAlgorithm)
-		c.linkedServers[s.GetID()] = s
+	processSetup = bully.Setup{}
+
+	for k, v := range processSetup.Setup(serverCount, c.emitter, heartbeatPause) {
+		c.linkedServers[k] = v
 	}
 
-	c.electionAlgorithm.ConnectServers(c.linkedServers)
-
 	for _, currserver := range c.linkedServers {
+
 		go currserver.Boot()
 	}
 
@@ -76,7 +75,7 @@ func (c Cluster) ReadEvent() map[string]string {
 	return c.emitter.Read()
 }
 
-func (c Cluster) getServerByID(id string) (*server.Server, error) {
+func (c Cluster) getServerByID(id string) (server.Process, error) {
 	for key, s := range c.linkedServers {
 		if id == key {
 			return s, nil
