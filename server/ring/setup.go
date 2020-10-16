@@ -15,5 +15,18 @@ type Setup struct {
 func (s Setup) Setup(c int, e *communication.Emitter, t time.Duration) map[string]server.Process {
 	lp := make(map[string]server.Process)
 
+	sa := make([]*Process, c)
+
+	for i := 0; i < c; i++ {
+		sa[i] = New(e, t)
+	}
+
+	for i := 0; i < c; i++ {
+		for k := (i + 1) % c; k != i; k = (k + 1) % c {
+			sa[i].linkedServers = append(sa[i].linkedServers, sa[k])
+		}
+		lp[sa[i].GetID()] = sa[i]
+	}
+
 	return lp
 }

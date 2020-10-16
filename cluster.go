@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/LostLaser/election/server"
-	"github.com/LostLaser/election/server/bully"
 	"github.com/LostLaser/election/server/communication"
 )
 
@@ -20,8 +19,6 @@ func New(processSetup server.Setup, serverCount int, heartbeatPause time.Duratio
 	c := new(Cluster)
 	c.linkedServers = make(map[string]server.Process)
 	c.emitter = communication.New(serverCount * 10)
-
-	processSetup = bully.Setup{}
 
 	for k, v := range processSetup.Setup(serverCount, c.emitter, heartbeatPause) {
 		c.linkedServers[k] = v

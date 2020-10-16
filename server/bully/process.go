@@ -68,7 +68,7 @@ func (b *Process) isHighest() bool {
 		if id > b.ID {
 			if neighbor.IsUp() {
 				b.Emitter.Write(b.ID, id, "START_NEW_ELECTION")
-				neighbor.TriggerElection = true
+				neighbor.triggerElection = true
 				return false
 			}
 		}

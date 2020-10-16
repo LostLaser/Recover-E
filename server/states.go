@@ -1,8 +1,8 @@
 package server
 
 const (
-	// Running is the state that servers when will be set to when online
+	// Running is the state that server will be set to when online
 	Running = iota
-	// Stopped is the state that servers when will be set to when offline
+	// Stopped is the state that server will be set to when offline
 	Stopped = iota
 )

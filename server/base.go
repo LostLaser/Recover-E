@@ -10,13 +10,12 @@ import (
 
 // Base is a single entity
 type Base struct {
-	Master          string
-	ID              string
-	State           int
-	ElectionLock    sync.Mutex
-	TriggerElection bool
-	Emitter         *communication.Emitter
-	HeartbeatPause  time.Duration
+	Master         string
+	ID             string
+	State          int
+	ElectionLock   sync.Mutex
+	Emitter        *communication.Emitter
+	HeartbeatPause time.Duration
 }
 
 // New will create a cluster with the specified number of servers
@@ -28,11 +27,6 @@ func New(e *communication.Emitter, heartbeatPause time.Duration) *Base {
 	s.HeartbeatPause = heartbeatPause
 
 	return s
-}
-
-// Boot brings up the server and runs main process
-func (s *Base) Boot() {
-	s.State = Running
 }
 
 // Restart the provided server
