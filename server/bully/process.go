@@ -48,6 +48,7 @@ func (b *Process) startElection() {
 	b.Emitter.Write(b.ID, "", "ELECTION_STARTED")
 	if b.isHighest() {
 		b.notifyLow()
+		b.Emitter.Write(b.ID, b.ID, "ELECT")
 		b.SetMaster(b.ID)
 		b.Emitter.Write(b.ID, "", "ELECTED")
 	}
@@ -78,8 +79,8 @@ func (b *Process) isHighest() bool {
 
 func (b *Process) notifyLow() {
 	for key, neighbor := range b.NeighborServers {
-		if key < b.ID {
-			neighbor.SetMaster(b.ID)
+		if key < b.ID && neighbor.SetMaster(b.ID) {
+			b.Emitter.Write(b.ID, neighbor.ID, "ELECT")
 		}
 	}
 }

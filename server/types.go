@@ -13,7 +13,7 @@ type Process interface {
 	Stop()
 	Print()
 	GetID() string
-	SetMaster(string)
+	SetMaster(string) bool
 	IsUp() bool
 }
 

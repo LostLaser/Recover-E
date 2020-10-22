@@ -13,7 +13,7 @@ type Process struct {
 	server.Base
 	linkedServers []*Process
 	electionQueue chan message.Election
-	electedQueue  chan message.Elected
+	notifyQueue   chan message.Notify
 }
 
 // New will create a cluster with the specified number of servers
@@ -23,6 +23,8 @@ func New(e *communication.Emitter, heartbeatPause time.Duration) *Process {
 	b.State = server.Running
 	b.Emitter = e
 	b.HeartbeatPause = heartbeatPause
+	b.electionQueue = make(chan message.Election, 4)
+	b.notifyQueue = make(chan message.Notify, 4)
 
 	return b
 }
@@ -30,8 +32,8 @@ func New(e *communication.Emitter, heartbeatPause time.Duration) *Process {
 // Boot brings up the server and runs main process
 func (r *Process) Boot() {
 	r.State = server.Running
-	r.run()
 	go r.electionResponder()
+	r.run()
 }
 
 func (r *Process) run() {
@@ -50,17 +52,21 @@ func (r *Process) electionResponder() {
 			// add name to alive list and send to neighbor
 			if m.Exists(r.ID) {
 				r.SetMaster(m.GetHighest())
-				r.getNeighbor().electedQueue <- message.NewElected(m.GetHighest())
+				q := message.NewElected(m.GetHighest())
+				q.AddVisited(r.ID)
+				r.getNeighbor().notifyQueue <- q
 			} else {
+				r.Emitter.Write(r.ID, r.getNeighbor().ID, "ELECT")
 				m.AddNotified(r.ID)
 				r.getNeighbor().electionQueue <- m
 			}
-		case m := <-r.electedQueue:
+		case m := <-r.notifyQueue:
 			// set master to consensus and send to neighbor
-			r.SetMaster(m.Master)
 			if !m.Visited(r.ID) {
+				r.SetMaster(m.Master)
 				m.AddVisited(r.ID)
-				r.getNeighbor().electedQueue <- m
+				r.Emitter.Write(r.ID, r.getNeighbor().ID, "ELECT")
+				r.getNeighbor().notifyQueue <- m
 			}
 		}
 	}
@@ -71,12 +77,13 @@ func (r *Process) startElection() {
 	if p == nil {
 		return
 	}
+	r.Emitter.Write(r.ID, r.getNeighbor().ID, "START_NEW_ELECTION")
 	p.electionQueue <- message.NewElection(r.ID)
 }
 
 func (r *Process) pingMaster() bool {
 	r.Emitter.Write(r.ID, r.Master, "HEARTBEAT")
-	if r.getServer(r.Master) == nil || (r.Master != r.ID && !r.getServer(r.Master).IsUp()) {
+	if r.Master == "" || (r.Master != r.ID && !r.getServer(r.Master).IsUp()) {
 		return false
 	}
 

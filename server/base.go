@@ -53,17 +53,18 @@ func (s *Base) GetID() string {
 }
 
 // SetMaster assigns the specified master to the calling server's master variable
-func (s *Base) SetMaster(masterID string) {
+func (s *Base) SetMaster(masterID string) bool {
 	if !s.IsUp() {
-		return
+		return false
 	}
 	s.ElectionLock.Lock()
 	defer s.ElectionLock.Unlock()
 	if masterID != s.ID && s.ID == s.Master {
 		s.Emitter.Write(s.ID, "", "NOT_MASTER")
 	}
-	s.Emitter.Write(masterID, s.ID, "ELECT")
 	s.Master = masterID
+
+	return true
 }
 
 // IsUp returns wether or not the current server is running
