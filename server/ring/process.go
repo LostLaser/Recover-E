@@ -52,17 +52,20 @@ func (r *Process) electionResponder() {
 			// add name to alive list and send to neighbor
 			if m.Exists(r.ID) {
 				r.SetMaster(m.GetHighest())
-				q := message.NewElected(m.GetHighest())
+				q := message.NewNotify(m.GetHighest())
 				q.AddVisited(r.ID)
 				r.getNeighbor().notifyQueue <- q
 			} else {
-				r.Emitter.Write(r.ID, r.getNeighbor().ID, "ELECT")
+				r.Emitter.Write(r.ID, r.getNeighbor().ID, "START_NEW_ELECTION")
 				m.AddNotified(r.ID)
 				r.getNeighbor().electionQueue <- m
 			}
 		case m := <-r.notifyQueue:
 			// set master to consensus and send to neighbor
 			if !m.Visited(r.ID) {
+				if r.ID == m.Master {
+					r.Emitter.Write(r.ID, "", "ELECTED")
+				}
 				r.SetMaster(m.Master)
 				m.AddVisited(r.ID)
 				r.Emitter.Write(r.ID, r.getNeighbor().ID, "ELECT")

@@ -6,8 +6,8 @@ type Notify struct {
 	visited []string
 }
 
-// NewElected creates a new instance of an Notify message
-func NewElected(id string) Notify {
+// NewNotify creates a new instance of an Notify message
+func NewNotify(id string) Notify {
 	e := Notify{}
 	e.visited = make([]string, 0)
 	e.Master = id

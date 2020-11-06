@@ -18,6 +18,11 @@ func (e *Election) AddNotified(id string) {
 	e.notified = append(e.notified, id)
 }
 
+// NotifiedCount gets the number of items in the notified list
+func (e *Election) NotifiedCount() int {
+	return len(e.notified)
+}
+
 // GetHighest will return the highest value in the notified list
 func (e *Election) GetHighest() string {
 	max := ""
