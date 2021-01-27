@@ -32,14 +32,14 @@ func New(e *communication.Emitter, heartbeatPause time.Duration) *Base {
 // Restart the provided server
 func (s *Base) Restart() {
 	s.State = Running
-	s.Emitter.Write(s.ID, "", "STARTED")
+	s.Emitter.Write(s.ID, "", communication.Started)
 }
 
 // Stop the provided server
 func (s *Base) Stop() {
 	s.State = Stopped
 	s.Master = ""
-	s.Emitter.Write(s.ID, "", "STOPPED")
+	s.Emitter.Write(s.ID, "", communication.Stopped)
 }
 
 // Print displays the server information in a readable format
@@ -60,7 +60,7 @@ func (s *Base) SetMaster(masterID string) bool {
 	s.ElectionLock.Lock()
 	defer s.ElectionLock.Unlock()
 	if masterID != s.ID && s.ID == s.Master {
-		s.Emitter.Write(s.ID, "", "NOT_MASTER")
+		s.Emitter.Write(s.ID, "", communication.NotMaster)
 	}
 	s.Master = masterID
 
