@@ -11,7 +11,7 @@ import (
 type Setup struct {
 }
 
-// Setup links together the specified amount of bully election servers together
+// Setup links together the specified amount of ring election servers together
 func (s Setup) Setup(c int, e *communication.Emitter, t time.Duration) map[string]server.Process {
 	lp := make(map[string]server.Process)
 

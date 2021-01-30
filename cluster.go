@@ -68,7 +68,7 @@ func (c Cluster) StartServer(id string) error {
 }
 
 //ReadEvent will retrieve a single event log of the servers' actions
-func (c Cluster) ReadEvent() map[string]string {
+func (c Cluster) ReadEvent() interface{} {
 	return c.emitter.Read()
 }
 

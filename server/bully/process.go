@@ -45,18 +45,18 @@ func (b *Process) run() {
 }
 
 func (b *Process) startElection() {
-	b.Emitter.Write(b.ID, "", communication.ElectionStarted)
+	b.Emitter.Write(communication.NewControl(b.ID, communication.ElectionStarted))
 	if b.isHighest() {
 		b.notifyLow()
-		b.Emitter.Write(b.ID, b.ID, communication.Elect)
+		b.Emitter.Write(communication.NewEvent(b.ID, b.ID, communication.Elect))
 		b.SetMaster(b.ID)
-		b.Emitter.Write(b.ID, "", communication.Elected)
+		b.Emitter.Write(communication.NewControl(b.ID, communication.Elected))
 	}
-	b.Emitter.Write(b.ID, "", communication.ElectionEnded)
+	b.Emitter.Write(communication.NewControl(b.ID, communication.ElectionEnded))
 }
 
 func (b *Process) pingMaster() bool {
-	b.Emitter.Write(b.ID, b.Master, communication.Heartbeat)
+	b.Emitter.Write(communication.NewEvent(b.ID, b.Master, communication.Heartbeat))
 	if b.Master == "" || (b.Master != b.ID && !b.NeighborServers[b.Master].IsUp()) {
 		return false
 	}
@@ -68,7 +68,7 @@ func (b *Process) isHighest() bool {
 	for id, neighbor := range b.NeighborServers {
 		if id > b.ID {
 			if neighbor.IsUp() {
-				b.Emitter.Write(b.ID, id, communication.StartNewElection)
+				b.Emitter.Write(communication.NewEvent(b.ID, id, communication.StartNewElection))
 				neighbor.triggerElection = true
 				return false
 			}
@@ -80,7 +80,7 @@ func (b *Process) isHighest() bool {
 func (b *Process) notifyLow() {
 	for key, neighbor := range b.NeighborServers {
 		if key < b.ID && neighbor.SetMaster(b.ID) {
-			b.Emitter.Write(b.ID, neighbor.ID, communication.Elect)
+			b.Emitter.Write(communication.NewEvent(b.ID, neighbor.ID, communication.Elect))
 		}
 	}
 }

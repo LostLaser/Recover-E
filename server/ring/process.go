@@ -56,7 +56,7 @@ func (r *Process) electionResponder() {
 				q.AddVisited(r.ID)
 				r.getNeighbor().notifyQueue <- q
 			} else {
-				r.Emitter.Write(r.ID, r.getNeighbor().ID, communication.StartNewElection)
+				r.Emitter.Write(communication.NewEvent(r.ID, r.getNeighbor().ID, communication.StartNewElection))
 				m.AddNotified(r.ID)
 				r.getNeighbor().electionQueue <- m
 			}
@@ -64,11 +64,11 @@ func (r *Process) electionResponder() {
 			// set master to consensus and send to neighbor
 			if !m.Visited(r.ID) {
 				if r.ID == m.Master {
-					r.Emitter.Write(r.ID, "", communication.Elected)
+					r.Emitter.Write(communication.NewControl(r.ID, communication.Elected))
 				}
 				r.SetMaster(m.Master)
 				m.AddVisited(r.ID)
-				r.Emitter.Write(r.ID, r.getNeighbor().ID, communication.Elect)
+				r.Emitter.Write(communication.NewEvent(r.ID, r.getNeighbor().ID, communication.Elect))
 				r.getNeighbor().notifyQueue <- m
 			}
 		}
@@ -80,12 +80,12 @@ func (r *Process) startElection() {
 	if p == nil {
 		return
 	}
-	r.Emitter.Write(r.ID, r.getNeighbor().ID, communication.StartNewElection)
+	r.Emitter.Write(communication.NewEvent(r.ID, r.getNeighbor().ID, communication.StartNewElection))
 	p.electionQueue <- message.NewElection(r.ID)
 }
 
 func (r *Process) pingMaster() bool {
-	r.Emitter.Write(r.ID, r.Master, communication.Heartbeat)
+	r.Emitter.Write(communication.NewEvent(r.ID, r.Master, communication.Heartbeat))
 	if r.Master == "" || (r.Master != r.ID && !r.getServer(r.Master).IsUp()) {
 		return false
 	}
