@@ -19,11 +19,12 @@ jobs:
         go-version: ^1.15
 
     - name: Execute test
-      run: make test
+      run: |
+      sh ./.github/scripts/testCov.sh
 
     - name: Upload coverage to codecov
       uses: codecov/codecov-action@v1
       with:
-        file: cover.out
+        file: coverage.txt
         fail_ci_if_error: true
         verbose: true
