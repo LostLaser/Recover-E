@@ -18,7 +18,6 @@ jobs:
       with:
         go-version: ^1.15
 
-<<<<<<< HEAD
     - name: Execute test
       run: make test
 
@@ -28,14 +27,3 @@ jobs:
         file: cover.out
         fail_ci_if_error: true
         verbose: true
-=======
-    - name: Test
-      run: go test -v ./...
-
-    - name: Upload coverage to codecov
-    uses: codecov/codecov-action@v1
-    with:
-      file: cover.out
-      fail_ci_if_error: true
-      verbose: true
->>>>>>> 4bb43314e41ea1f3104aeb0e64b3e9aabdb97b9e

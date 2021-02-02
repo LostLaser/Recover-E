@@ -19,8 +19,4 @@ jobs:
         go-version: ^1.15
 
     - name: Build
-<<<<<<< HEAD
       run: make build
-=======
-      run: go build -v ./...
->>>>>>> 4bb43314e41ea1f3104aeb0e64b3e9aabdb97b9e
