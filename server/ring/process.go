@@ -20,7 +20,7 @@ type Process struct {
 func New(e *communication.Emitter, heartbeatPause time.Duration) *Process {
 	b := new(Process)
 	b.ID = server.GenerateUniqueID()
-	b.State = server.Running
+	b.State = server.Stopped
 	b.Emitter = e
 	b.HeartbeatPause = heartbeatPause
 	b.electionQueue = make(chan message.Election, 4)

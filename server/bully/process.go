@@ -14,11 +14,11 @@ type Process struct {
 	triggerElection bool
 }
 
-// New will create a cluster with the specified number of servers
+// New will create a new instance of a bully server
 func New(e *communication.Emitter, heartbeatPause time.Duration) *Process {
 	b := new(Process)
 	b.ID = server.GenerateUniqueID()
-	b.State = server.Running
+	b.State = server.Stopped
 	b.Emitter = e
 	b.HeartbeatPause = heartbeatPause
 	b.NeighborServers = make(map[string]*Process)
@@ -26,7 +26,7 @@ func New(e *communication.Emitter, heartbeatPause time.Duration) *Process {
 	return b
 }
 
-// Boot brings up the server and runs main process
+// Boot brings up the server and runs main process. This function blocks while the process is active
 func (b *Process) Boot() {
 	b.State = server.Running
 	b.run()
