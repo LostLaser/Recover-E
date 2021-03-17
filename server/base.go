@@ -22,7 +22,7 @@ type Base struct {
 func New(e *communication.Emitter, heartbeatPause time.Duration) *Base {
 	s := new(Base)
 	s.ID = GenerateUniqueID()
-	s.State = Running
+	s.State = Stopped
 	s.Emitter = e
 	s.HeartbeatPause = heartbeatPause
 
@@ -67,7 +67,7 @@ func (s *Base) SetMaster(masterID string) bool {
 	return true
 }
 
-// IsUp returns wether or not the current server is running
+// IsUp returns whether or not the current server is running
 func (s *Base) IsUp() bool {
 	return s.State == Running
 }
