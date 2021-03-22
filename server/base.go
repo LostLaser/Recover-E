@@ -42,9 +42,10 @@ func (s *Base) Stop() {
 	s.Emitter.Write(communication.NewControl(s.ID, communication.Stopped))
 }
 
-// Print displays the server information in a readable format
-func (s *Base) Print() {
-	fmt.Println("ID:", s.ID, " Master:", s.Master)
+// ToString displays the server information in a readable format
+func (s *Base) ToString() string {
+	str := fmt.Sprint("ID:", s.ID, "Master:", s.Master)
+	return str
 }
 
 // GetID returns the server id

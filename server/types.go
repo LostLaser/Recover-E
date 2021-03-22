@@ -11,7 +11,7 @@ type Process interface {
 	Boot()
 	Restart()
 	Stop()
-	Print()
+	ToString() string
 	GetID() string
 	SetMaster(string) bool
 	IsUp() bool

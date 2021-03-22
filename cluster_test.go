@@ -5,14 +5,17 @@ import (
 	"time"
 
 	"github.com/LostLaser/election/server/bully"
+	"go.uber.org/zap"
 )
+
+var logger, _ = zap.NewDevelopment()
 
 func TestNew(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
 	setup := bully.Setup{}
 
-	cluster := New(setup, expectedServerCount, cycleTime)
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
 
 	actualServerCount := len(cluster.linkedServers)
 	if actualServerCount != expectedServerCount {
@@ -29,7 +32,7 @@ func TestServerListingCount(t *testing.T) {
 	cycleTime := time.Second
 	setup := bully.Setup{}
 
-	cluster := New(setup, expectedServerCount, cycleTime)
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
 
 	actualServerCount := len(cluster.ServerIds())
 	if actualServerCount != expectedServerCount {
@@ -42,7 +45,7 @@ func TestServerListingConsistency(t *testing.T) {
 	cycleTime := time.Second
 	setup := bully.Setup{}
 
-	cluster := New(setup, serverCount, cycleTime)
+	cluster := New(setup, serverCount, cycleTime, logger)
 
 	for _, i := range cluster.ServerIds() {
 		found := false
@@ -63,7 +66,7 @@ func TestReadEvent(t *testing.T) {
 	cycleTime := time.Second
 	setup := bully.Setup{}
 
-	cluster := New(setup, expectedServerCount, cycleTime)
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
 	c := make(chan (int))
 
 	go func() {
@@ -86,7 +89,7 @@ func TestStop(t *testing.T) {
 	cycleTime := time.Second
 	setup := bully.Setup{}
 
-	cluster := New(setup, expectedServerCount, cycleTime)
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
 	serverIds := cluster.ServerIds()
 
 	if len(cluster.ServerIds()) == 0 {
@@ -107,7 +110,7 @@ func TestStopInvl(t *testing.T) {
 	cycleTime := time.Second
 	setup := bully.Setup{}
 
-	cluster := New(setup, expectedServerCount, cycleTime)
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
 	err := cluster.StopServer("invl")
 	if err == nil {
 		t.Errorf("No error recieved for invalid id: %s", id)
