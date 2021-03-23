@@ -85,6 +85,19 @@ func TestReadEvent(t *testing.T) {
 
 }
 
+func TestPurge(t *testing.T) {
+	expectedServerCount := 3
+	cycleTime := time.Second
+	setup := bully.Setup{}
+
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
+
+	cluster.Purge()
+	for _, v := range cluster.linkedServers {
+		assert.False(t, v.IsUp(), "One of the servers was not stopped")
+	}
+}
+
 func TestStop(t *testing.T) {
 	expectedServerCount := 3
 	cycleTime := time.Second
@@ -115,6 +128,39 @@ func TestStopInvl(t *testing.T) {
 	err := cluster.StopServer("invl")
 	if err == nil {
 		t.Errorf("No error recieved for invalid id: %s", id)
+	}
+}
+
+func TestStart(t *testing.T) {
+	expectedServerCount := 3
+	cycleTime := time.Second
+	setup := bully.Setup{}
+
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
+	serverIds := cluster.ServerIds()
+
+	if len(cluster.ServerIds()) == 0 {
+		t.Error("Test requires at least one server in cluster")
+		return
+	}
+	id := serverIds[0]
+
+	err := cluster.StartServer(id)
+	if err != nil {
+		assert.FailNow(t, "Could not start the server")
+	}
+}
+
+func TestStartInvl(t *testing.T) {
+	expectedServerCount := 3
+	id := "invl"
+	cycleTime := time.Second
+	setup := bully.Setup{}
+
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
+	err := cluster.StartServer(id)
+	if err == nil {
+		assert.FailNow(t, "No error recieved for invalid id")
 	}
 }
 
