@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/LostLaser/election/server/bully"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
@@ -115,4 +116,28 @@ func TestStopInvl(t *testing.T) {
 	if err == nil {
 		t.Errorf("No error recieved for invalid id: %s", id)
 	}
+}
+
+func TestMarshalJSON(t *testing.T) {
+	expectedServerCount := 3
+	cycleTime := time.Second
+	setup := bully.Setup{}
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
+
+	_, err := cluster.MarshalJSON()
+	if err != nil {
+		assert.FailNow(t, "Unexpected error when marshalling to json", err)
+	}
+}
+
+func TestString(t *testing.T) {
+	expectedServerCount := 3
+	cycleTime := time.Second
+	setup := bully.Setup{}
+	cluster := New(setup, expectedServerCount, cycleTime, logger)
+	cluster.Purge()
+
+	str := cluster.String()
+
+	assert.Contains(t, str, cluster.ID, "String cluster representation does not contain cluster ID")
 }
