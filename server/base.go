@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -42,9 +43,10 @@ func (s *Base) Stop() {
 	s.Emitter.Write(communication.NewControl(s.ID, communication.Stopped))
 }
 
-// Print displays the server information in a readable format
-func (s *Base) Print() {
-	fmt.Println("ID:", s.ID, " Master:", s.Master)
+// String displays the server information in a readable format
+func (s *Base) String() string {
+	str := fmt.Sprint("ID:", s.ID, "Master:", s.Master)
+	return str
 }
 
 // GetID returns the server id
@@ -70,4 +72,21 @@ func (s *Base) SetMaster(masterID string) bool {
 // IsUp returns whether or not the current server is running
 func (s *Base) IsUp() bool {
 	return s.State == Running
+}
+
+// MarshalJSON retrieves the target server as a json string
+func (s *Base) MarshalJSON() ([]byte, error) {
+	r := struct {
+		ID             string
+		HeartbeatPause time.Duration
+		Master         string
+		State          int
+	}{
+		s.ID,
+		s.HeartbeatPause,
+		s.Master,
+		s.State,
+	}
+
+	return json.Marshal(r)
 }

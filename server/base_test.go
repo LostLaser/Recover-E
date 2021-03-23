@@ -60,3 +60,12 @@ func TestIsUp(t *testing.T) {
 	b.Restart()
 	assert.True(t, b.IsUp())
 }
+
+func TestMarshalJSON(t *testing.T) {
+	b := New(communication.New(10), heartbeatPause)
+
+	_, err := b.MarshalJSON()
+	if err != nil {
+		assert.FailNow(t, "Unexpected error when marshalling to json", err)
+	}
+}
