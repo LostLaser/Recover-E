@@ -11,10 +11,11 @@ type Process interface {
 	Boot()
 	Restart()
 	Stop()
-	ToString() string
+	String() string
 	GetID() string
 	SetMaster(string) bool
 	IsUp() bool
+	MarshalJSON() ([]byte, error)
 }
 
 // Setup describes all classes that can be used to construct an array of servers

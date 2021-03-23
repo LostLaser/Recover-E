@@ -1,7 +1,9 @@
 package election
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/LostLaser/election/server"
@@ -32,7 +34,7 @@ func New(processSetup server.Setup, serverCount int, heartbeatPause time.Duratio
 	for _, currserver := range c.linkedServers {
 		go currserver.Boot()
 	}
-	c.logger.Debugf("Created cluster with %v servers. Servers: %v", len(c.linkedServers), zap.Any("Servers", c.linkedServers))
+	c.logger.Debugf("Created cluster: %v", c)
 	return c
 }
 
@@ -61,7 +63,7 @@ func (c Cluster) StopServer(id string) error {
 	if err == nil {
 		s.Stop()
 	} else {
-		c.logger.Errorf("Issue stopping server with id %s, error: %v", id, err)
+		c.logger.Infof("%v", err)
 	}
 	return err
 }
@@ -73,7 +75,7 @@ func (c Cluster) StartServer(id string) error {
 	if err == nil {
 		s.Restart()
 	} else {
-		c.logger.Errorf("Issue starting server with id %v error: %v", id, err)
+		c.logger.Infof("%v", err)
 	}
 	return err
 }
@@ -85,11 +87,40 @@ func (c Cluster) ReadEvent() interface{} {
 	return ev
 }
 
-func (c Cluster) getServerByID(id string) (server.Process, error) {
-	for key, s := range c.linkedServers {
-		if id == key {
-			return s, nil
-		}
+// MarshalJSON retrieves the target cluster as a json string
+func (c Cluster) MarshalJSON() ([]byte, error) {
+	var serverArray []server.Process
+	for _, s := range c.linkedServers {
+		serverArray = append(serverArray, s)
 	}
+
+	r := struct {
+		ID          string
+		ServerCount int
+		Servers     []server.Process
+	}{
+		c.ID,
+		len(c.linkedServers),
+		serverArray,
+	}
+
+	return json.Marshal(r)
+
+}
+
+// String gets the string representation of the target cluster
+func (c Cluster) String() string {
+	v, err := c.MarshalJSON()
+	if err != nil {
+		return err.Error()
+	}
+	return fmt.Sprintf("%s", v)
+}
+
+func (c Cluster) getServerByID(id string) (server.Process, error) {
+	if s, found := c.linkedServers[id]; found {
+		return s, nil
+	}
+
 	return nil, errors.New("No server found with ID '" + id + "'")
 }
