@@ -19,13 +19,7 @@ func TestNew(t *testing.T) {
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
 
 	actualServerCount := len(cluster.linkedServers)
-	if actualServerCount != expectedServerCount {
-		t.Errorf("Server count was incorrect, got: %d, want: %d.", actualServerCount, expectedServerCount)
-	}
-}
-
-func TestNeighbors(t *testing.T) {
-
+	assert.Equal(t, expectedServerCount, actualServerCount, "Server count was incorrect")
 }
 
 func TestServerListingCount(t *testing.T) {
@@ -36,9 +30,7 @@ func TestServerListingCount(t *testing.T) {
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
 
 	actualServerCount := len(cluster.ServerIds())
-	if actualServerCount != expectedServerCount {
-		t.Errorf("Server count was incorrect, got: %d, want: %d.", actualServerCount, expectedServerCount)
-	}
+	assert.Equal(t, expectedServerCount, actualServerCount, "Server count was incorrect")
 }
 
 func TestServerListingConsistency(t *testing.T) {
@@ -56,9 +48,7 @@ func TestServerListingConsistency(t *testing.T) {
 				break
 			}
 		}
-		if !found {
-			t.Errorf("Didn't find linked server %s in server listing", i)
-		}
+		assert.True(t, found, "Didn't find linked server %s in server listing")
 	}
 }
 
@@ -80,7 +70,7 @@ func TestReadEvent(t *testing.T) {
 	case <-c:
 		return
 	default:
-		t.Error("No event received after expected time interval")
+		assert.FailNow(t, "No event received after expected time interval")
 	}
 
 }
@@ -106,16 +96,11 @@ func TestStop(t *testing.T) {
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
 	serverIds := cluster.ServerIds()
 
-	if len(cluster.ServerIds()) == 0 {
-		t.Error("Test requires at least one server in cluster")
-		return
-	}
+	assert.NotEqual(t, 0, len(cluster.ServerIds()), "Test requires at least one server in cluster")
 	id := serverIds[0]
 
 	err := cluster.StopServer(id)
-	if err != nil {
-		t.Errorf("Error recieved for invalid id: %s, error: %s", id, err)
-	}
+	assert.Nil(t, err, "Error recieved for invalid id")
 }
 
 func TestStopInvl(t *testing.T) {
@@ -123,12 +108,11 @@ func TestStopInvl(t *testing.T) {
 	id := "invl"
 	cycleTime := time.Second
 	setup := bully.Setup{}
-
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
-	err := cluster.StopServer("invl")
-	if err == nil {
-		t.Errorf("No error recieved for invalid id: %s", id)
-	}
+
+	err := cluster.StopServer(id)
+	assert.NotNil(t, err, "No error recieved for invalid id")
+
 }
 
 func TestStart(t *testing.T) {
@@ -139,16 +123,12 @@ func TestStart(t *testing.T) {
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
 	serverIds := cluster.ServerIds()
 
-	if len(cluster.ServerIds()) == 0 {
-		t.Error("Test requires at least one server in cluster")
-		return
-	}
+	assert.NotEqual(t, 0, len(cluster.ServerIds()), "Test requires at least one server in cluster")
+
 	id := serverIds[0]
 
 	err := cluster.StartServer(id)
-	if err != nil {
-		assert.FailNow(t, "Could not start the server")
-	}
+	assert.Nil(t, err, "Could not start the server", err)
 }
 
 func TestStartInvl(t *testing.T) {
@@ -159,9 +139,8 @@ func TestStartInvl(t *testing.T) {
 
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
 	err := cluster.StartServer(id)
-	if err == nil {
-		assert.FailNow(t, "No error recieved for invalid id")
-	}
+	assert.NotNil(t, err, "No error recieved for invalid id")
+
 }
 
 func TestMarshalJSON(t *testing.T) {
@@ -171,9 +150,7 @@ func TestMarshalJSON(t *testing.T) {
 	cluster := New(setup, expectedServerCount, cycleTime, logger)
 
 	_, err := cluster.MarshalJSON()
-	if err != nil {
-		assert.FailNow(t, "Unexpected error when marshalling to json", err)
-	}
+	assert.Nil(t, err, "Unexpected error when marshalling to json", err)
 }
 
 func TestString(t *testing.T) {
