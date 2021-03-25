@@ -29,7 +29,7 @@ func TestBootNoLinkedServers(t *testing.T) {
 	time.Sleep(settleTime)
 
 	assert.Equal(t, expectedState, r.State)
-	// TODO: assert.Equal(t, r.ID, r.Master, "Lone server not elected as master")
+	assert.Equal(t, r.ID, r.Master, "Lone server not elected as master")
 }
 
 func TestBootLinkedServers(t *testing.T) {

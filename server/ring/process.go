@@ -78,6 +78,8 @@ func (r *Process) electionResponder() {
 func (r *Process) startElection() {
 	p := r.getNeighbor()
 	if p == nil {
+		// only server in cluster
+		r.SetMaster(r.ID)
 		return
 	}
 	r.Emitter.Write(communication.NewEvent(r.ID, r.getNeighbor().ID, communication.StartNewElection))
