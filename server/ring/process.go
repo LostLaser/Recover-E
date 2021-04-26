@@ -38,10 +38,10 @@ func (r *Process) Boot() {
 
 func (r *Process) run() {
 	for {
+		time.Sleep(r.HeartbeatPause)
 		if r.State == server.Running && !r.pingMaster() {
 			r.startElection()
 		}
-		time.Sleep(r.HeartbeatPause)
 	}
 }
 
