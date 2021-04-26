@@ -34,13 +34,13 @@ func (b *Process) Boot() {
 
 func (b *Process) run() {
 	for {
+		time.Sleep(b.HeartbeatPause)
 		if b.State == server.Running {
 			if !b.pingMaster() || b.triggerElection {
 				b.startElection()
 				b.triggerElection = false
 			}
 		}
-		time.Sleep(b.HeartbeatPause)
 	}
 }
 
